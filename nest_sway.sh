@@ -143,7 +143,7 @@ else
   # Give the socket and associated lock files to the nested session's user
   chown ${NUSER}: ${NSOCKPATH} ${NSOCKPATH}.lock
   
-  # Script to run as the nested session's user: clean up stale symlink in
+  # Script to run as the nested session's user: clean up stale symlinks in
   # XDG_RUNTIME_DIR then run Sway
   CMD='[ "${XDG_RUNTIME_DIR}" ] &&
 	(find ${XDG_RUNTIME_DIR} -maxdepth 1 \
