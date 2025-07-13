@@ -1,5 +1,5 @@
 # nest_sway.sh
-### Version 1.0
+### Version 1.1
 
 * [Installation](#Installation)
 * [Usage](#Usage)
