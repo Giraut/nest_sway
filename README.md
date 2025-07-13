@@ -14,13 +14,20 @@ Shell script to start a nested Sway (Wayland) session as another user.
 
 ## Installation
 
+- Clone this repository **recursively**:
+
+  ```console
+  git clone https://github.com/Giraut/nest_sway.git --recurse-submodules
+  cd nest_sway
+  ```
+
 - Install [filterway](https://github.com/andrewbaxter/filterway):
 
   ```console
-  git clone https://github.com/andrewbaxter/filterway
   cd filterway
   cargo build
   sudo install -m 755 target/debug/filterway /usr/bin
+  cd ..
   ```
 
 - Copy the `nest_sway.sh` script somewhere in your PATH. I personally put all my scripts in a `~/scripts/` directory:
