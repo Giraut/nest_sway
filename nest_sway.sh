@@ -41,6 +41,11 @@ if [ $(whoami) != root ]; then
     echo "Please install if from https://github.com/andrewbaxter/filterway"
     exit
   fi
+
+  # Find out if filterway supports --title
+  if filterway -h | grep -q title; then
+    FILTERWAY_CAN_SET_WINDOW_TITLE=1
+  fi
   
   # Get a unique ID for this nested session
   UUID=$(uuidgen)
@@ -73,7 +78,14 @@ if [ $(whoami) != root ]; then
   # the socket would compromise the directory
   rm -f ${NSOCKPATH}
   ID="Nested Sway - ${NUSER} ($UUID)"
-  filterway --upstream ${RSOCKPATH} --downstream ${NSOCKPATH} --app-id "${ID}" &
+  TITLE="Sway desktop - ${NUSER}"
+  if [ "${FILTERWAY_CAN_SET_WINDOW_TITLE}" ]; then
+    filterway --upstream ${RSOCKPATH} --downstream ${NSOCKPATH} \
+		--app-id "${ID}" --title "${TITLE}" &
+  else
+    filterway --upstream ${RSOCKPATH} --downstream ${NSOCKPATH} \
+		--app-id "${ID}" &
+  fi
   FILTERWAY_PID=$!
   
   # Wait until filterway has created the socket and associated lock files for
