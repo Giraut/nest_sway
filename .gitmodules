@@ -1,3 +1,4 @@
 [submodule "filterway"]
 	path = filterway
 	url = https://github.com/andrewbaxter/filterway
+	branch = xdgshell-title-filter
