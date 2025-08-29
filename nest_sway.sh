@@ -81,10 +81,9 @@ if [ $(whoami) != root ]; then
   TITLE="Sway desktop - ${NUSER}"
   if [ "${FILTERWAY_CAN_SET_WINDOW_TITLE}" ]; then
     filterway --upstream ${RSOCKPATH} --downstream ${NSOCKPATH} \
-		--app-id "${ID}" --title "${TITLE}" &
+		--title "${TITLE}" &
   else
-    filterway --upstream ${RSOCKPATH} --downstream ${NSOCKPATH} \
-		--app-id "${ID}" &
+    filterway --upstream ${RSOCKPATH} --downstream ${NSOCKPATH} &
   fi
   FILTERWAY_PID=$!
   
@@ -114,7 +113,6 @@ if [ $(whoami) != root ]; then
 
   echo "NUSER=${NUSER}" > ${VARFILE}
   echo "NWDISPLAY=${NWDISPLAY}" >> ${VARFILE}
-  echo "UUID=${UUID}" >> ${VARFILE}
   echo "NSOCKPATH=${NSOCKPATH}" >> ${VARFILE}
   echo "SWAYSOCK=${SWAYSOCK}" >> ${VARFILE}
   echo "NSWAYSOCK=${NSWAYSOCK}" >> ${VARFILE}
@@ -144,7 +142,7 @@ else
   . $1
 
   # Check that we were passed all the variables we need
-  for VAR in NUSER NWDISPLAY UUID NSOCKPATH SWAYSOCK NSWAYSOCK FILTERWAY_PID; do
+  for VAR in NUSER NWDISPLAY NSOCKPATH SWAYSOCK NSWAYSOCK FILTERWAY_PID; do
     eval "VAL=\${$VAR}"
     if [ ! "${VAL}" ]; then
       echo "$0 (running as root): missing ${VAR} variable"
@@ -178,7 +176,7 @@ else
   COUNTDOWN=3
   while [ ${COUNTDOWN} -gt 0 ]; do
     if SWAYSOCK=${SWAYSOCK} swaymsg -t get_tree | \
-	grep -q "app_id.*${UUID}"; then
+	grep -q "pid.: ${FILTERWAY_PID},"; then
       COUNTDOWN=5
     fi
     sleep 1
