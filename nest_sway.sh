@@ -71,13 +71,11 @@ if [ $(whoami) != root ]; then
   # Unique filespec for the nested Sway socket
   NSWAYSOCK=/tmp/sway-nested-ipc.${NUSER}.${UUID}.sock
   
-  # Run filterway in the background to rename the nested session's app ID, but
-  # more importantly to expose our private Wayland socket located in
-  # XDG_RUNTIME_DIR, because XDG_RUNTIME_DIR is most likely a tmpfs-mounted
-  # directory and changing its permissions to allow a different user tp access
-  # the socket would compromise the directory
+  # Run filterway in the background to expose our private Wayland socket
+  # located in XDG_RUNTIME_DIR, because XDG_RUNTIME_DIR is most likely a
+  # tmpfs-mounted directory and changing its permissions to allow a different
+  # user tp access the socket would compromise the directory
   rm -f ${NSOCKPATH}
-  ID="Nested Sway - ${NUSER} ($UUID)"
   TITLE="Sway desktop - ${NUSER}"
   if [ "${FILTERWAY_CAN_SET_WINDOW_TITLE}" ]; then
     filterway --upstream ${RSOCKPATH} --downstream ${NSOCKPATH} \
