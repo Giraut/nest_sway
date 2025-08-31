@@ -71,17 +71,20 @@ if [ $(whoami) != root ]; then
   # Unique filespec for the nested Sway socket
   NSWAYSOCK=/tmp/sway-nested-ipc.${NUSER}.${UUID}.sock
   
-  # Run filterway in the background to expose our private Wayland socket
-  # located in XDG_RUNTIME_DIR, because XDG_RUNTIME_DIR is most likely a
-  # tmpfs-mounted directory and changing its permissions to allow a different
-  # user tp access the socket would compromise the directory
+  # Run filterway in the background to rename the nested session's app ID, but
+  # more importantly to expose our private Wayland socket located in
+  # XDG_RUNTIME_DIR, because XDG_RUNTIME_DIR is most likely a tmpfs-mounted
+  # directory and changing its permissions to allow a different user tp access
+  # the socket would compromise the directory
   rm -f ${NSOCKPATH}
+  ID="Nested Sway - ${NUSER} ($UUID)"
   TITLE="Sway desktop - ${NUSER}"
   if [ "${FILTERWAY_CAN_SET_WINDOW_TITLE}" ]; then
     filterway --upstream ${RSOCKPATH} --downstream ${NSOCKPATH} \
-		--title "${TITLE}" &
+		--app-id "${ID}" --title "${TITLE}" &
   else
-    filterway --upstream ${RSOCKPATH} --downstream ${NSOCKPATH} &
+    filterway --upstream ${RSOCKPATH} --downstream ${NSOCKPATH} \
+		--app-id "${ID}" &
   fi
   FILTERWAY_PID=$!
   
@@ -111,6 +114,7 @@ if [ $(whoami) != root ]; then
 
   echo "NUSER=${NUSER}" > ${VARFILE}
   echo "NWDISPLAY=${NWDISPLAY}" >> ${VARFILE}
+  echo "UUID=${UUID}" >> ${VARFILE}
   echo "NSOCKPATH=${NSOCKPATH}" >> ${VARFILE}
   echo "SWAYSOCK=${SWAYSOCK}" >> ${VARFILE}
   echo "NSWAYSOCK=${NSWAYSOCK}" >> ${VARFILE}
@@ -140,7 +144,7 @@ else
   . $1
 
   # Check that we were passed all the variables we need
-  for VAR in NUSER NWDISPLAY NSOCKPATH SWAYSOCK NSWAYSOCK FILTERWAY_PID; do
+  for VAR in NUSER NWDISPLAY UUID NSOCKPATH SWAYSOCK NSWAYSOCK FILTERWAY_PID; do
     eval "VAL=\${$VAR}"
     if [ ! "${VAL}" ]; then
       echo "$0 (running as root): missing ${VAR} variable"
@@ -174,7 +178,7 @@ else
   COUNTDOWN=3
   while [ ${COUNTDOWN} -gt 0 ]; do
     if SWAYSOCK=${SWAYSOCK} swaymsg -t get_tree | \
-	grep -q "pid.: ${FILTERWAY_PID},"; then
+	grep -q "app_id.*${UUID}"; then
       COUNTDOWN=5
     fi
     sleep 1
